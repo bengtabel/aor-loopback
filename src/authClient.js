@@ -6,7 +6,8 @@ export const authClient = (loginApiUrl, noAccessPage = '/login') => {
         if (type === 'AUTH_LOGIN') {
             const request = new Request(loginApiUrl, {
                 method: 'POST',
-                body: JSON.stringify(params),
+                body: JSON.stringify({ "email": params.username,
+                "password": params.password, "realm": "backoffice" }),
                 headers: new Headers({ 'Content-Type': 'application/json' }),
             });
             return fetch(request)
