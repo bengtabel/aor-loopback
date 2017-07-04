@@ -111,7 +111,18 @@ export default (apiUrl, httpClient = fetchJson) => {
             case GET_LIST:
             case GET_MANY_REFERENCE:
                 if (!headers.has('x-total-count')) {
-                    throw new Error('The X-Total-Count header is missing in the HTTP Response. The jsonServer REST client expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?');
+                    const query = {};
+                    query['where'] = {...params.filter};
+                    // query['where'][params.target] = params.id;
+                    const countUrl = `${apiUrl}/${resource}/count?${queryParameters({where: JSON.stringify(query['where'])})}`;
+                    const countOpt = {};
+                    countOpt.method = 'GET';
+                    console.log(countUrl);
+                    return httpClient(countUrl, countOpt)
+                    .then(countRequest => {
+                        const countbody = JSON.parse(countRequest.body);
+                        return { data: json, total: countbody.count }});
+//                    throw new Error('The X-Total-Count header is missing in the HTTP Response. The jsonServer REST client expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?');
                 }
                 return {
                     data: json,
